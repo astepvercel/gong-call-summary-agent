@@ -9,6 +9,19 @@
  * - SF_USERNAME
  * - SF_LOGIN_URL
  * - SF_PRIVATE_KEY_PEM
+ *
+ * ## Extending for Other CRMs
+ *
+ * To add support for a different CRM (HubSpot, Pipedrive, etc.):
+ * 1. Create a new file (e.g., `lib/hubspot.ts`) following this pattern
+ * 2. Implement `isCrmEnabled()` and `getAccountData()` functions
+ * 3. Update `lib/sandbox-context.ts` to call your CRM's getAccountData()
+ * 4. Add your CRM's env vars to `lib/config.ts`
+ *
+ * ## Customizing Salesforce Fields
+ *
+ * Modify the SOQL query in `getAccountData()` to fetch additional fields
+ * from your Salesforce schema.
  */
 
 import { SignJWT, importPKCS8 } from 'jose';
@@ -69,40 +82,6 @@ export async function getSalesforceAccessToken(): Promise<{
 }
 
 /**
- * Fetch a Salesforce object by type and ID
- */
-export async function fetchSalesforceObject<T = Record<string, unknown>>({
-  objectType,
-  objectId,
-  instanceUrl,
-  accessToken,
-}: {
-  objectType: string;
-  objectId: string;
-  instanceUrl: string;
-  accessToken: string;
-}): Promise<T> {
-  const response = await fetch(
-    `${instanceUrl}/services/data/v61.0/sobjects/${objectType}/${objectId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch Salesforce ${objectType}: ${response.status} ${response.statusText}`
-    );
-  }
-
-  return response.json();
-}
-
-/**
  * Query Salesforce using SOQL
  */
 export async function querySalesforce<T = Record<string, unknown>>({
@@ -135,44 +114,15 @@ export async function querySalesforce<T = Record<string, unknown>>({
 }
 
 /**
- * Update a Salesforce object
- */
-export async function updateSalesforceObject({
-  objectType,
-  objectId,
-  data,
-  instanceUrl,
-  accessToken,
-}: {
-  objectType: string;
-  objectId: string;
-  data: Record<string, unknown>;
-  instanceUrl: string;
-  accessToken: string;
-}): Promise<void> {
-  const response = await fetch(
-    `${instanceUrl}/services/data/v61.0/sobjects/${objectType}/${objectId}`,
-    {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    }
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(
-      `Failed to update Salesforce ${objectType}: ${response.status} ${errorText}`
-    );
-  }
-}
-
-/**
  * Get account data from Salesforce by Account ID
- * Customize the fields based on your Salesforce schema
+ *
+ * Customize the SOQL query below to fetch fields from your CRM schema.
+ * The returned data is written to the sandbox as markdown for the AI agent.
+ *
+ * To add opportunity data, contacts, or other related objects:
+ * 1. Add additional queries below
+ * 2. Update the return type and returned object
+ * 3. Update `formatAccountMarkdown()` in sandbox-context.ts
  */
 export async function getAccountData(accountId: string): Promise<{
   accountData: Record<string, unknown> | null;
@@ -185,7 +135,8 @@ export async function getAccountData(accountId: string): Promise<{
   try {
     const { accessToken, instanceUrl } = await getSalesforceAccessToken();
 
-    // Query account - customize fields based on your Salesforce schema
+    // Query account - customize fields based on your Salesforce (or other CRM)schema
+    // Example additions: Description, NumberOfEmployees, AnnualRevenue, Custom_Field__c
     const accountQueryResult = await querySalesforce({
       query: `SELECT Id, Name, Website, Industry, Type FROM Account WHERE Id = '${accountId}'`,
       instanceUrl,
@@ -194,10 +145,17 @@ export async function getAccountData(accountId: string): Promise<{
 
     const accountData = accountQueryResult.records[0] || null;
 
+    // To add opportunity data, uncomment and customize:
+    // const oppQueryResult = await querySalesforce({
+    //   query: `SELECT Id, Name, Amount, StageName, CloseDate FROM Opportunity WHERE AccountId = '${accountId}' ORDER BY CloseDate DESC LIMIT 5`,
+    //   instanceUrl,
+    //   accessToken,
+    // });
+    // const opportunityData = oppQueryResult.records;
+
     return { accountData, opportunityData: null };
   } catch (error) {
     console.error('Failed to fetch Salesforce data:', error);
     return { accountData: null, opportunityData: null };
   }
 }
-

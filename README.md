@@ -128,6 +128,8 @@ The agent posts:
 
 Enable CRM context by setting Salesforce credentials. The agent will enrich summaries with account data.
 
+See [CRM Customization](#crm-customization) for details on customizing fields or adding other CRMs.
+
 ## How It Works
 
 1. **Webhook Received**: Gong sends call data when a call completes
@@ -209,6 +211,91 @@ For analyzing historical calls, integrate with a database:
 ### Custom Playbooks
 
 Add playbook detection by configuring `config.playbooks` in `lib/config.ts`.
+
+### CRM Customization
+
+The agent supports optional CRM integration to enrich call context. By default, Salesforce is supported, but you can customize fields or add other CRMs.
+
+#### Customizing Salesforce Fields
+
+Modify the SOQL query in `lib/salesforce.ts` → `getAccountData()`:
+
+```typescript
+// Add custom fields to the query
+const accountQueryResult = await querySalesforce({
+  query: `SELECT Id, Name, Website, Industry, Type, 
+          AnnualRevenue, NumberOfEmployees, Custom_Field__c 
+          FROM Account WHERE Id = '${accountId}'`,
+  instanceUrl,
+  accessToken,
+});
+```
+
+To include related objects (opportunities, contacts):
+
+```typescript
+// Add opportunity query
+const oppQueryResult = await querySalesforce({
+  query: `SELECT Id, Name, Amount, StageName, CloseDate 
+          FROM Opportunity 
+          WHERE AccountId = '${accountId}' 
+          ORDER BY CloseDate DESC LIMIT 5`,
+  instanceUrl,
+  accessToken,
+});
+```
+
+Update `lib/sandbox-context.ts` → `formatAccountMarkdown()` to include the new fields in the agent's context.
+
+#### Adding a Different CRM (HubSpot, Pipedrive, etc.)
+
+1. **Create a new CRM module** (e.g., `lib/hubspot.ts`):
+
+```typescript
+export function isHubSpotEnabled(): boolean {
+  return !!process.env.HUBSPOT_API_KEY;
+}
+
+export async function getAccountData(companyId: string): Promise<{
+  accountData: Record<string, unknown> | null;
+}> {
+  // Implement your CRM's API calls
+}
+```
+
+2. **Add config** in `lib/config.ts`:
+
+```typescript
+hubspot: {
+  enabled: !!process.env.HUBSPOT_API_KEY,
+  apiKey: process.env.HUBSPOT_API_KEY || '',
+},
+```
+
+3. **Update sandbox context** in `lib/sandbox-context.ts`:
+
+```typescript
+import { getAccountData, isHubSpotEnabled } from './hubspot';
+
+// In generateFilesForSandbox():
+if (isHubSpotEnabled() && options.hubspotCompanyId) {
+  const { accountData } = await getAccountData(options.hubspotCompanyId);
+  // Write to sandbox...
+}
+```
+
+4. **Extract CRM IDs from Gong context** in `workflows/gong-summary/index.ts`:
+
+```typescript
+// Gong may include CRM context from integrations
+const hubspotCompanyId = data.callData.context
+  ?.find((c) => c.system === 'HubSpot')
+  ?.objects?.find((o) => o.objectType === 'Company')?.objectId;
+```
+
+#### Disabling CRM Integration
+
+Simply don't set the `SF_*` environment variables. The integration checks `isSalesforceEnabled()` before making any API calls.
 
 ## Development
 
