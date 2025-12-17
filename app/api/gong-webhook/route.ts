@@ -12,7 +12,7 @@
  * See: https://gong.io/developers/webhooks
  */
 
-import { start } from '@vercel/workflow/api';
+import { start } from 'workflow/api';
 import type { GongWebhook } from '@/lib/types';
 import { workflowGongSummary } from '@/workflows/gong-summary';
 import { createLogger } from '@/lib/logger';
