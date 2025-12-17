@@ -20,7 +20,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "slugify": "^1.6.6",
-    "@vercel/workflow": "^0.0.1",
+    "workflow": "4.0.1-beta.24",
     "zod": "^3.23.0"
   },
   "devDependencies": {
@@ -31,4 +31,3 @@
     "typescript": "^5.0.0"
   }
 }
-
