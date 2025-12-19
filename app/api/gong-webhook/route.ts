@@ -47,12 +47,6 @@ export async function POST(request: Request) {
       isTest: data.isTest,
     });
 
-    // Skip test webhooks in production (optional)
-    if (data.isTest && process.env.NODE_ENV === 'production') {
-      logger.info('Test webhook received, skipping in production');
-      return Response.json({ message: 'Test webhook acknowledged' });
-    }
-
     // Start the workflow
     await start(workflowGongSummary, [data]);
 
