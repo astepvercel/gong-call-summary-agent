@@ -1,13 +1,5 @@
 /**
  * Gong Call Summary Agent
- *
- * This agent analyzes call transcripts using a Vercel Sandbox environment
- * and provides structured summaries with objections, tasks, and insights.
- *
- * Features:
- * - Sandbox-based file exploration
- * - Configurable prompts and output schema
- * - Structured output with Zod validation
  */
 
 import { Output, ToolLoopAgent } from 'ai';
@@ -135,11 +127,7 @@ export async function runGongAgent(
   const result = await gongSummaryAgent.generate({
     prompt: `Analyze this call transcript and provide a comprehensive summary.
 
-Focus on:
-1. Key discussion points and decisions
-2. Any objections or concerns raised
-3. Action items and next steps
-4. Overall call assessment
+Focus on: Key discussion points and decisions,Any objections or concerns raised, Action items and next steps, Overall call assessment
 
 Use the executeCommand tool to explore the transcript files before generating your summary.`,
     options: {

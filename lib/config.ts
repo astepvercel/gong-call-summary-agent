@@ -1,8 +1,7 @@
 import { z } from 'zod';
 
 /**
- * Default system prompt for the Gong call summary agent.
- * This can be customized via the AGENT_SYSTEM_PROMPT environment variable.
+ * Default system prompt for the Gong call summary agent. This can be customized via the AGENT_SYSTEM_PROMPT environment variable.
  */
 const DEFAULT_SYSTEM_PROMPT = `You are an expert sales call analyst that reviews call transcripts and provides actionable insights.
 
@@ -132,7 +131,7 @@ export const config = {
 
   // Sandbox configuration
   sandbox: {
-    timeout: '10m', // Sandbox timeout duration
+    timeout: '10m' as const, // Sandbox timeout duration
   },
 };
 

@@ -11,7 +11,6 @@
  * different agent implementations.
  */
 
-import { tool } from 'ai';
 import { z } from 'zod';
 import type { Sandbox } from '@vercel/sandbox';
 
@@ -22,7 +21,7 @@ import type { Sandbox } from '@vercel/sandbox';
  * to search and explore call transcript files.
  */
 export function createExecuteCommandTool(sandbox: Sandbox) {
-  return tool({
+  return {
     description: `Execute shell commands to search and explore call transcript files.
 
 Available commands: grep, cat, ls, find, head, tail, wc, sort, uniq, awk, sed
@@ -38,7 +37,7 @@ Example commands:
       command: z.string().describe('The shell command to execute'),
       args: z.array(z.string()).describe('Arguments to pass to the command'),
     }),
-    execute: async ({ command, args }) => {
+    execute: async ({ command, args }: { command: string; args: string[] }) => {
       console.log('Executing command:', { command, args });
 
       try {
@@ -59,7 +58,7 @@ Example commands:
         };
       }
     },
-  });
+  };
 }
 
 /**
@@ -69,13 +68,13 @@ Example commands:
  * You can integrate with Exa, Tavily, or other search providers.
  */
 export function createWebSearchTool() {
-  return tool({
+  return {
     description: `Search the web for additional context about topics discussed in the call.
 Use this to find product documentation, competitor information, or industry context.`,
     parameters: z.object({
       query: z.string().describe('The search query'),
     }),
-    execute: async ({ query }) => {
+    execute: async ({ query }: { query: string }) => {
       // Placeholder - integrate with your preferred search provider
       // Examples: Exa (exalabs/ai-sdk), Tavily, Serper, etc.
       console.log('Web search requested:', query);
@@ -86,7 +85,7 @@ Use this to find product documentation, competitor information, or industry cont
           'Web search not configured. Set up a search provider (Exa, Tavily, etc.) to enable this feature.',
       };
     },
-  });
+  };
 }
 
 /**
@@ -99,4 +98,3 @@ export function createAgentTools(sandbox: Sandbox) {
     // webSearch: createWebSearchTool(),
   };
 }
-
