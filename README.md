@@ -1,6 +1,6 @@
 # Gong Call Summary Agent
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyour-org%2Fgong-call-summary-agent&env=GONG_ACCESS_KEY,GONG_SECRET_KEY,ANTHROPIC_API_KEY&envDescription=Required%20API%20keys%20for%20Gong%20and%20AI%20model&project-name=gong-call-summary-agent)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel-labs%2Fcoding-agent-template&env=GONG_ACCESS_KEY,GONG_SECRET_KEY,ANTHROPIC_API_KEY&envDescription=Required%20API%20keys%20for%20Gong%20and%20AI%20model&project-name=gong-call-summary-agent)
 
 An AI-powered agent that automatically summarizes Gong sales calls using Vercel's Sandbox architecture. The agent analyzes call transcripts and generates structured summaries with objections, action items, and insights.
 

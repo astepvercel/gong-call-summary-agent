@@ -1,8 +1,7 @@
 /**
- * Status / Documentation Page
+ * Landing Page - Gong Call Summary Agent
  *
- * Provides a simple landing page with setup instructions
- * and configuration status.
+ * Minimalist status page showing configuration and integration status.
  */
 
 import { validateConfig, config } from '@/lib/config';
@@ -13,96 +12,208 @@ export default function HomePage() {
   return (
     <main
       style={{
-        maxWidth: '800px',
-        margin: '0 auto',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
         padding: '40px 20px',
-        fontFamily: 'system-ui, sans-serif',
       }}
     >
-      <h1>Gong Call Summary Agent</h1>
-
-      <p>
-        AI-powered call summary agent that processes Gong webhooks and generates
-        structured summaries using Vercel Sandbox.
-      </p>
-
-      <h2>Status</h2>
-
-      <div
+      {/* Heading */}
+      <h1
         style={{
-          padding: '16px',
-          borderRadius: '8px',
-          backgroundColor: configStatus.valid ? '#d4edda' : '#f8d7da',
-          marginBottom: '20px',
+          fontSize: '2.5rem',
+          fontWeight: 600,
+          fontStyle: 'italic',
+          margin: 0,
+          marginBottom: '16px',
+          letterSpacing: '-0.02em',
         }}
       >
-        <strong>Configuration: </strong>
-        {configStatus.valid ? (
-          <span style={{ color: '#155724' }}>[Valid]</span>
-        ) : (
-          <span style={{ color: '#721c24' }}>
-            [Invalid] - {configStatus.errors.join(', ')}
-          </span>
-        )}
-      </div>
+        Gong Call Summary Agent
+      </h1>
 
-      <h2>Integrations</h2>
-
-      <ul>
-        <li>
-          <strong>Gong API:</strong>{' '}
-          {config.gong.accessKey ? '[Configured]' : '[Not configured]'}
-        </li>
-        <li>
-          <strong>Slack:</strong>{' '}
-          {config.slack.enabled ? '[Enabled]' : '[Disabled] (optional)'}
-        </li>
-        <li>
-          <strong>Salesforce:</strong>{' '}
-          {config.salesforce.enabled ? '[Enabled]' : '[Disabled] (optional)'}
-        </li>
-      </ul>
-
-      <h2>Webhook Endpoint</h2>
-
-      <p>
-        Configure your Gong webhook to POST to:
-        <br />
-        <code
-          style={{
-            backgroundColor: '#f4f4f4',
-            padding: '8px 12px',
-            borderRadius: '4px',
-            display: 'inline-block',
-            marginTop: '8px',
-          }}
-        >
-          https://your-domain.vercel.app/api/gong-webhook
-        </code>
-      </p>
-
-      <h2>Quick Start</h2>
-
-      <ol>
-        <li>Set required environment variables (GONG_ACCESS_KEY, GONG_SECRET_KEY, ANTHROPIC_API_KEY)</li>
-        <li>Deploy to Vercel</li>
-        <li>Configure Gong webhook to point to your deployment</li>
-        <li>(Optional) Configure Slack for notifications</li>
-      </ol>
-
-      <h2>Documentation</h2>
-
-      <p>
-        See the{' '}
+      {/* Subtitle */}
+      <p
+        style={{
+          fontSize: '1.1rem',
+          color: '#666',
+          margin: 0,
+          marginBottom: '48px',
+          textAlign: 'center',
+        }}
+      >
+        AI-powered call summaries using{' '}
         <a
-          href="https://github.com/your-org/gong-call-summary-agent"
+          href="https://vercel.com/docs/functions/ai-sdk"
           target="_blank"
           rel="noopener noreferrer"
+          style={{ color: '#666', textDecoration: 'underline' }}
         >
-          README
+          Vercel Sandbox
         </a>{' '}
-        for full documentation.
+        and{' '}
+        <a
+          href="https://sdk.vercel.ai"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#666', textDecoration: 'underline' }}
+        >
+          AI SDK
+        </a>
       </p>
+
+      {/* Status Card */}
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '560px',
+          backgroundColor: '#fff',
+          borderRadius: '16px',
+          border: '1px solid #e5e5e5',
+          padding: '24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        }}
+      >
+        {/* Configuration Status */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            marginBottom: '20px',
+            paddingBottom: '20px',
+            borderBottom: '1px solid #f0f0f0',
+          }}
+        >
+          <span
+            style={{
+              width: '20px',
+              height: '20px',
+              borderRadius: '50%',
+              backgroundColor: configStatus.valid ? '#22c55e' : '#ef4444',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '12px',
+              color: '#fff',
+            }}
+          >
+            {configStatus.valid ? '✓' : '✕'}
+          </span>
+          <span style={{ fontSize: '0.95rem', color: '#333' }}>
+            {configStatus.valid
+              ? 'Configuration valid'
+              : `Configuration error: ${configStatus.errors.join(', ')}`}
+          </span>
+        </div>
+
+        {/* Integrations */}
+        <div
+          style={{
+            display: 'flex',
+            gap: '24px',
+            marginBottom: '20px',
+            paddingBottom: '20px',
+            borderBottom: '1px solid #f0f0f0',
+          }}
+        >
+          <IntegrationBadge
+            name="Gong"
+            enabled={!!config.gong.accessKey}
+          />
+          <IntegrationBadge
+            name="Slack"
+            enabled={config.slack.enabled}
+            optional
+          />
+          <IntegrationBadge
+            name="Salesforce"
+            enabled={config.salesforce.enabled}
+            optional
+          />
+        </div>
+
+        {/* Webhook Endpoint */}
+        <div>
+          <div
+            style={{
+              fontSize: '0.8rem',
+              color: '#888',
+              marginBottom: '8px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+          >
+            Webhook Endpoint
+          </div>
+          <code
+            style={{
+              display: 'block',
+              backgroundColor: '#f5f5f5',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              fontSize: '0.9rem',
+              color: '#333',
+              fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace',
+            }}
+          >
+            POST /api/gong-webhook
+          </code>
+        </div>
+      </div>
+
+      {/* Footer Links */}
+      <div
+        style={{
+          marginTop: '32px',
+          display: 'flex',
+          gap: '24px',
+          fontSize: '0.9rem',
+        }}
+      >
+        <a
+          href="https://github.com/vercel/ai"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#888', textDecoration: 'none' }}
+        >
+          GitHub
+        </a>
+        <a
+          href="https://sdk.vercel.ai/docs"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#888', textDecoration: 'none' }}
+        >
+          Docs
+        </a>
+      </div>
     </main>
+  );
+}
+
+function IntegrationBadge({
+  name,
+  enabled,
+  optional = false,
+}: {
+  name: string;
+  enabled: boolean;
+  optional?: boolean;
+}) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <span
+        style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          backgroundColor: enabled ? '#22c55e' : optional ? '#d4d4d4' : '#ef4444',
+        }}
+      />
+      <span style={{ fontSize: '0.9rem', color: '#555' }}>{name}</span>
+    </div>
   );
 }
