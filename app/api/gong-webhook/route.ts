@@ -21,7 +21,7 @@ import { validateConfig } from '@/lib/config';
 const logger = createLogger('gong-webhook');
 
 export async function POST(request: Request) {
-  // Validate configuration on first request
+
   const configValidation = validateConfig();
   if (!configValidation.valid) {
     logger.error('Configuration invalid', { errors: configValidation.errors });
@@ -37,6 +37,7 @@ export async function POST(request: Request) {
   try {
     const data = (await request.json()) as GongWebhook;
 
+    console.log('Data payload: ', data);
     logger.info('Webhook received', {
       callId: data.callData.metaData.id,
       callTitle: data.callData.metaData.title,
