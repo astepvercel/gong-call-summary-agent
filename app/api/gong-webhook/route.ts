@@ -3,13 +3,6 @@
  *
  * This is the entry point for Gong webhooks. When a call is completed,
  * Gong sends a POST request to this endpoint with call data.
- *
- * Setup:
- * 1. Deploy this application to Vercel
- * 2. Configure a Gong webhook to POST to: https://your-app.vercel.app/api/gong-webhook
- * 3. Select the "Call completed" event type
- *
- * See: https://gong.io/developers/webhooks
  */
 
 import { start } from 'workflow/api';
@@ -47,7 +40,6 @@ export async function POST(request: Request) {
       isTest: data.isTest,
     });
 
-    // Start the workflow
     await start(workflowGongSummary, [data]);
 
     logger.info('Workflow triggered', {

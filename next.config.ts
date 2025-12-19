@@ -1,11 +1,10 @@
 import type { NextConfig } from 'next';
+import { withWorkflow } from 'workflow/next';
 
 const nextConfig: NextConfig = {
-  // Enable experimental features for workflow support
   experimental: {
-    // Add any experimental features
   },
 };
 
-export default nextConfig;
+export default withWorkflow(nextConfig);
 
